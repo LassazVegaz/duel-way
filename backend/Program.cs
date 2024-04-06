@@ -1,4 +1,6 @@
+using DuelWay.Data;
 using DuelWay.Hubs;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,11 @@ builder.Services.AddCors(options =>
                .AllowAnyMethod()
                .AllowCredentials();
     });
+});
+
+builder.Services.AddDbContext<DuelWayContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DuelWayDb"));
 });
 
 

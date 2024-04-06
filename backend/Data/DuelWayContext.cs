@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DuelWay.Data;
 
-public class DuelWayContext : DbContext
+public class DuelWayContext(DbContextOptions<DuelWayContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
 
