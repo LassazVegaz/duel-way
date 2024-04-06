@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# development app settings are ignored. create it on your own
+appsettings.Development.json
