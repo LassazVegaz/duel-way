@@ -4,6 +4,26 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication()
+    .AddCookie(config =>
+    {
+        config.Cookie.Name = "auth-cookie";
+
+        config.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
+
+        config.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 
 builder.Services.AddSignalR();
@@ -28,6 +48,9 @@ builder.Services.AddDbContext<DuelWayContext>(options =>
 var app = builder.Build();
 
 app.UseCors("dev policy");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -1,6 +1,8 @@
 ﻿using DuelWay.Data;
 using DuelWay.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -24,11 +26,19 @@ public class AuthController(DuelWayContext context) : ControllerBase
         [
             new("name", userInDb.Name)
         ];
-        var identity = new ClaimsIdentity(claims, null, "name", null);
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, "name", null);
         var principal = new ClaimsPrincipal(identity);
 
         await HttpContext.SignInAsync(principal);
 
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync();
         return Ok();
     }
 
@@ -39,5 +49,15 @@ public class AuthController(DuelWayContext context) : ControllerBase
         await _context.SaveChangesAsync();
 
         return StatusCode(StatusCodes.Status201Created);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult> Get()
+    {
+        var userName = User.Identity!.Name;
+        var user = await _context.Users.FirstAsync(u => u.Name == userName);
+        user.Password = "";
+        return Ok(user);
     }
 }
