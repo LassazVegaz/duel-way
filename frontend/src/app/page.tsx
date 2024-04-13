@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function AuthPage() {
-  return redirect("/auth/login");
+  return <main className="text-white">Hello World</main>;
 }

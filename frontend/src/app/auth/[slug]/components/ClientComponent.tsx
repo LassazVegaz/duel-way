@@ -21,8 +21,6 @@ const InputField = (props: React.ComponentProps<"input">) => {
 const SubmitButton = (props: SubmitButtonProps) => {
   const { pending } = useFormStatus();
 
-  console.log("pending", pending);
-
   return (
     <button
       type="submit"
