@@ -49,6 +49,9 @@ public class AuthController(DuelWayContext context, IHubContext<ChatHub, IChatCl
     [HttpPost("register")]
     public async Task<ActionResult> Register(User user)
     {
+        if (await _context.Users.AnyAsync(u => u.Name == user.Name))
+            return BadRequest("User with this name already exists");
+
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
