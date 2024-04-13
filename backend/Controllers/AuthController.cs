@@ -1,9 +1,12 @@
-﻿using DuelWay.Data;
+﻿using DuelWay.Clients;
+using DuelWay.Data;
+using DuelWay.Hubs;
 using DuelWay.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -11,9 +14,10 @@ namespace DuelWay.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(DuelWayContext context) : ControllerBase
+public class AuthController(DuelWayContext context, IHubContext<ChatHub, IChatClient> chatHub) : ControllerBase
 {
     private readonly DuelWayContext _context = context;
+    private readonly IHubContext<ChatHub, IChatClient> _chatHub = chatHub;
 
     [HttpPost("login")]
     public async Task<ActionResult> Login(User user)
@@ -47,6 +51,8 @@ public class AuthController(DuelWayContext context) : ControllerBase
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+
+        await _chatHub.Clients.All.UserJoined(user.Name);
 
         return StatusCode(StatusCodes.Status201Created);
     }
