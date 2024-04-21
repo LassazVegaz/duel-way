@@ -2,6 +2,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { formSubmitAction, FormSubmitActionResults } from "../page.actions";
 import { twMerge } from "tailwind-merge";
+import Link from "next/link";
 
 type ClientComponentProps = {
   slug: string;
@@ -38,6 +39,8 @@ const SubmitButton = (props: SubmitButtonProps) => {
 export default function ClientComponent(props: ClientComponentProps) {
   const [state, action] = useFormState(formSubmitAction, {});
 
+  const oppositeSlug = props.slug === "login" ? "register" : "login";
+
   return (
     <main className="flex items-center justify-center h-screen">
       <form
@@ -51,9 +54,17 @@ export default function ClientComponent(props: ClientComponentProps) {
           placeholder="Password"
           required
         />
+        <input type="hidden" name="slug" value={props.slug} />
         <div className="mt-5 text-center">
           <SubmitButton slug={props.slug} />
         </div>
+
+        <Link
+          className="text-white text-center underline"
+          href={`/auth/${oppositeSlug}`}
+        >
+          {oppositeSlug}
+        </Link>
       </form>
 
       <div className="text-center text-red-600 absolute bottom-10">
