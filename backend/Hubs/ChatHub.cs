@@ -15,6 +15,12 @@ public class ChatHub : Hub<IChatClient>
         await Clients.All.UserJoined(user);
     }
 
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var user = Context.User?.Identity?.Name!;
+        await Clients.All.UserLeft(user);
+    }
+
 
     [Authorize]
     public async Task SendMessage(string message)

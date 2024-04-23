@@ -55,8 +55,6 @@ public class AuthController(DuelWayContext context, IHubContext<ChatHub, IChatCl
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        await _chatHub.Clients.All.UserJoined(user.Name);
-
         return StatusCode(StatusCodes.Status201Created);
     }
 
