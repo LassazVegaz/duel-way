@@ -1,5 +1,8 @@
-import { redirect } from "next/navigation";
+import { isLoggedIn } from "@/lib/auth.server";
+import { redirect, RedirectType } from "next/navigation";
 
 export default function AuthPage() {
-  return <main className="text-white">Hello World</main>;
+  if (!isLoggedIn()) redirect("/auth/login", RedirectType.replace);
+
+  return <main>Hello World</main>;
 }
