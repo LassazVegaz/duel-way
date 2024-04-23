@@ -32,7 +32,7 @@ const ChatBoard = () => {
   }, []);
 
   return (
-    <div className="border border-blue-400 py-2 px-3 flex flex-col gap-5">
+    <div className="border border-blue-400 py-2 px-3 flex flex-col gap-5 overflow-y-auto">
       {msgs.map((msg, i) => (
         <div key={i} className="flex justify-center text-slate-200">
           <div className="bg-slate-900 px-5 py-1 rounded border border-slate-700">
