@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { twMerge } from "tailwind-merge";
 
@@ -42,6 +42,16 @@ const UserMessage = (props: UserMessageProps) => (
 
 const ChatBoard = () => {
   const [msgs, setMsgs] = useState<Message[]>([]);
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      boardRef.current?.scrollTo({
+        top: boardRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
+  }, []);
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_API_URL + "/chat";
@@ -52,6 +62,7 @@ const ChatBoard = () => {
         ...msgs,
         { sender: "system", content: `${user} joined the chat` },
       ]);
+      scrollToBottom();
     });
 
     connection.on("UserLeft", (user: string) => {
@@ -59,6 +70,15 @@ const ChatBoard = () => {
         ...msgs,
         { sender: "system", content: `${user} left the chat` },
       ]);
+      scrollToBottom();
+    });
+
+    connection.on("ReceiveMessage", (user: string, message: string) => {
+      setMsgs((msgs) => [
+        ...msgs,
+        { sender: "user", content: message, senderName: user },
+      ]);
+      scrollToBottom();
     });
 
     connection
@@ -73,15 +93,18 @@ const ChatBoard = () => {
         console.log("Disconnected from chat server");
       });
     };
-  }, []);
+  }, [scrollToBottom]);
 
   return (
-    <div className="border border-blue-400 py-2 px-3 flex flex-col gap-5 overflow-y-auto">
+    <div
+      ref={boardRef}
+      className="border border-blue-400 py-2 px-3 flex flex-col gap-5 overflow-y-auto"
+    >
       {msgs.map((msg, i) =>
         msg.sender === "user" ? (
           <UserMessage
             key={i}
-            currentUser={msg.senderName === "lasindu"}
+            currentUser={msg.senderName === "abcd"}
             userName={msg.senderName}
           >
             {msg.content}
