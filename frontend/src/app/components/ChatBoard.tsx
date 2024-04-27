@@ -9,6 +9,10 @@ type SystemMessageProps = {
   children: React.ReactNode;
 };
 
+type ChatBoardProps = {
+  loggedInUser: string;
+};
+
 type UserMessageProps = {
   currentUser?: boolean;
   userName: string;
@@ -41,7 +45,7 @@ const UserMessage = (props: UserMessageProps) => (
   </div>
 );
 
-const ChatBoard = () => {
+const ChatBoard = (props: ChatBoardProps) => {
   const [msgs, setMsgs] = useState<Message[]>([]);
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -101,7 +105,7 @@ const ChatBoard = () => {
         msg.sender === "user" ? (
           <UserMessage
             key={i}
-            currentUser={msg.senderName === "abcd"}
+            currentUser={msg.senderName === props.loggedInUser}
             userName={msg.senderName}
           >
             {msg.content}
