@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import ReduxProvider from "@/components/ReduxProvider";
 
 const robot = Roboto({ weight: "400", subsets: ["latin"] });
 
@@ -16,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={robot.className}>{children}</body>
+      <body className={robot.className}>
+        <ReduxProvider>{children}</ReduxProvider>
+      </body>
     </html>
   );
 }
