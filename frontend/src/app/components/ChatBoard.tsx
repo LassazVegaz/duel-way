@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { twMerge } from "tailwind-merge";
+import { getConnection } from "@/lib/chat.client";
 
 // --- PROPS ---
 type SystemMessageProps = {
@@ -54,44 +55,40 @@ const ChatBoard = () => {
   }, []);
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_API_URL + "/chat";
-    const connection = new signalR.HubConnectionBuilder().withUrl(url).build();
+    const connection = getConnection();
 
-    connection.on("UserJoined", (user: string) => {
+    const onUserJoined = (user: string) => {
       setMsgs((msgs) => [
         ...msgs,
         { sender: "system", content: `${user} joined the chat` },
       ]);
       scrollToBottom();
-    });
+    };
 
-    connection.on("UserLeft", (user: string) => {
+    const onUserLeft = (user: string) => {
       setMsgs((msgs) => [
         ...msgs,
         { sender: "system", content: `${user} left the chat` },
       ]);
       scrollToBottom();
-    });
+    };
 
-    connection.on("ReceiveMessage", (user: string, message: string) => {
+    const onRecieveMessage = (user: string, message: string) => {
       setMsgs((msgs) => [
         ...msgs,
         { sender: "user", content: message, senderName: user },
       ]);
       scrollToBottom();
-    });
+    };
 
-    connection
-      .start()
-      .then(() => {
-        console.log("Connected to chat server");
-      })
-      .catch(() => {});
+    connection.on("UserJoined", onUserJoined);
+    connection.on("UserLeft", onUserLeft);
+    connection.on("ReceiveMessage", onRecieveMessage);
 
     return () => {
-      connection.stop().then(() => {
-        console.log("Disconnected from chat server");
-      });
+      connection.off("UserJoined", onUserJoined);
+      connection.off("UserLeft", onUserLeft);
+      connection.off("ReceiveMessage", onRecieveMessage);
     };
   }, [scrollToBottom]);
 

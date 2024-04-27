@@ -1,39 +1,19 @@
 "use client";
-import * as signalR from "@microsoft/signalr";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { getConnection } from "@/lib/chat.client";
+import { useCallback, useState } from "react";
 
 export default function SendForm() {
   const [sending, setSending] = useState(false);
-  const connection = useRef<signalR.HubConnection | null>(null);
-
-  useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_API_URL + "/chat";
-    connection.current = new signalR.HubConnectionBuilder()
-      .withUrl(url)
-      .build();
-
-    connection.current
-      .start()
-      .then(() => {
-        console.log("Connected to chat server");
-      })
-      .catch(() => {});
-
-    return () => {
-      connection.current?.stop().then(() => {
-        console.log("Disconnected from chat server");
-      });
-    };
-  }, []);
 
   const onSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input = e.currentTarget.querySelector("input") as HTMLInputElement;
-    if (!input || !connection.current) return;
+    if (!input) return;
     setSending(true);
 
     try {
-      await connection.current.send("SendMessage", input.value);
+      const connection = getConnection();
+      await connection.send("SendMessage", input.value);
       input.value = "";
       input.focus();
     } catch (error) {
